@@ -85,8 +85,10 @@ allSquares.forEach(square => {
 let startPositionID
 let draggedElement
 
-let kingInCheck
-let kingWasInCheck
+let blackKingInCheck
+let blackKingWasInCheck
+let whiteKingInCheck
+let whiteKingWasInCheck
 
 let newPos
 let oldPos
@@ -145,10 +147,12 @@ function dragDrop(e) {
         else if (!taken) {
             e.target.append(draggedElement);
         }
+
         revertTaken = !taken
         newPos = targetSquareID
         oldPos = startPositionID
         revertPiece = draggedElement
+
         if (checkChecker()) {
             revertMove();
         }
@@ -165,7 +169,6 @@ function dragDrop(e) {
     else {
         whiteIDs();
     }
-    console.log(document.querySelector(`[square-id="${newPos}"]`))
     if (revertTaken) {
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
     }
@@ -179,31 +182,46 @@ function dragDrop(e) {
     else {
         blackIDs();
     }
-    console.log(document.querySelector(`[square-id="${newPos}"]`))
     if (revertTaken) {
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
     }
  }
 
-
+//Checks to see if a square does not contain a piece
 function doesNotContainPiece(startID) {
     return !document.querySelector(`[square-id="${startID}"]`).firstChild || document.querySelector(`[square-id="${startID}"]`).firstChild == " " 
 }
 
-// Checks if a move is valid but does not currently check if the move is legal
-// Contains all the logic for how pieces should move
-
+// Checks to see if the white or black king is in check
+// Also updates if the kings were in check last turn
+// If the function resolves to true than the move is reverted
 function checkChecker() {
     
-    kingWasInCheck = kingInCheck
+    whiteKingWasInCheck = whiteKingInCheck
+    whiteKingInCheck = whiteInCheck()
 
-    kingInCheck = inCheck()
+    blackKingWasInCheck = blackKingInCheck
+    blackKingInCheck = blackInCheck()
 
-    if (kingWasInCheck && kingInCheck) {
+    if (playerTurn === 'black' && !blackKingWasInCheck && blackKingInCheck) {
         return true
     }
+
+    if (playerTurn === 'white' && !whiteKingWasInCheck && whiteKingInCheck) {
+        return true
+    }
+
+    if (whiteKingWasInCheck && whiteKingInCheck) {
+        return true
+    }
+    if (blackKingWasInCheck && blackKingInCheck) {
+        return true
+    }
+
 }
 
+// Checks if a move is valid but does not currently check if the move is legal
+// Contains all the logic for how pieces should move
 
 function checkIfValid(targetSquare, startPos, piece) {
     const targetID = Number(targetSquare)
@@ -814,7 +832,7 @@ function blackIDs() {
     square.setAttribute('square-id', i))
 }
 
-// Changes the playerTurn variable
+// Changes the playerTurn variable and boardIDs
  function changePlayer() {
 
     if (playerTurn === 'black') {
@@ -830,50 +848,63 @@ function blackIDs() {
 
  }
 
-
 // In Progress Function used to see if the king is in check
 // Conceptual Idea: Create a list of all opponent pieces, for each piece generate a list of all the legal squares that piece can move o
 // add all these lists together to make a list of all the legal squares the opponent can move to
 // if the king's square is in that list of legal move squares, the king is in check
- function inCheck() {
-    const blackHitSquares = []
+ function blackInCheck() {
+    whiteIDs();
+    let pieceSquares = []
+
     const whiteHitSquares = []
+    const whitePieces = document.querySelectorAll('.white')
 
-        const blackPieces = document.querySelectorAll('.black')
-        const whiteKingElement = document.querySelector('.piece.white#king');
-        blackIDs();
-        const whiteKingPosition = Number(whiteKingElement.parentNode.getAttribute("square-id"))
-        const blackKingElement = document.querySelector('.piece.black#king');
-        const blackKingPosition = Number(blackKingElement.parentNode.getAttribute("square-id"))
-        let pieceSquares = []
-
-        blackPieces.forEach((piece) => {
-            pieceSquares = checkAllLegalMovesForPiece(piece)
-            pieceSquares.forEach((square) => {
-                if (!blackHitSquares.includes(square)){
-                blackHitSquares.push(square)
-                }
-            })
-        })
-
-        
-        const whitePieces = document.querySelectorAll('.white')
-        whiteIDs();
-        whitePieces.forEach((piece) => {
-            if (piece.id === 'queen'){
-            pieceSquares = checkAllLegalMovesForPiece(piece)
-            pieceSquares.forEach((square) => {
-                if (!whiteHitSquares.includes(square)){
-                whiteHitSquares.push(square)
-                }
-            })
-        }
-        })
+    const blackKingElement = document.querySelector('.piece.black#king');
+    const blackKingPosition = Number(blackKingElement.parentNode.getAttribute("square-id"))
     
-    console.log("It is " + blackHitSquares.includes(whiteKingPosition) + " that the white king is in check")
-    console.log("It is " + whiteHitSquares.includes(blackKingPosition) + " that the black king is in check")
+    whitePieces.forEach((piece) => {
+        pieceSquares = checkAllLegalMovesForPiece(piece)
+        pieceSquares.forEach((square) => {
+            if (!whiteHitSquares.includes(square)){
+            whiteHitSquares.push(square)
+            }
+        })
+    })
+    
+    if (playerTurn == 'white') {
+        whiteIDs();
+    }
+    else {
+        blackIDs();
+    }
 
     console.log(whiteHitSquares)
+
+    console.log("It is " + whiteHitSquares.includes(blackKingPosition) + " that the black king is in check")
+
+    return whiteHitSquares.includes(blackKingPosition)
+
+ }
+
+ function whiteInCheck() {
+    blackIDs();
+    let pieceSquares = []
+
+
+    const blackHitSquares = []
+    const blackPieces = document.querySelectorAll('.black')
+
+    const whiteKingElement = document.querySelector('.piece.white#king');
+    const whiteKingPosition = Number(whiteKingElement.parentNode.getAttribute("square-id"))
+    
+    blackPieces.forEach((piece) => {
+        pieceSquares = checkAllLegalMovesForPiece(piece)
+        pieceSquares.forEach((square) => {
+            if (!blackHitSquares.includes(square)){
+            blackHitSquares.push(square)
+            }
+        })
+    })
 
     if (playerTurn == 'white') {
         whiteIDs();
@@ -882,14 +913,13 @@ function blackIDs() {
         blackIDs();
     }
 
-    if (blackHitSquares.includes(whiteKingPosition) || whiteHitSquares.includes(blackKingPosition)) {
-        return true;
-    }
-    
-    return false;
+
+
+    console.log("It is " + blackHitSquares.includes(whiteKingPosition) + " that the white king is in check")
+
+    return blackHitSquares.includes(whiteKingPosition)
 
  }
-
 
 // Helper function for the inCheck function
 // In Progress, currently iterates through all the positions 0-63 on the board and checks if a piece can legally move there
