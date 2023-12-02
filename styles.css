@@ -34,8 +34,12 @@ path {
     background-color: beige;
 }
 
-
 .brown {
+    background-color: rgb(128, 66, 66);
+}
+
+
+.blue {
     background-color: lightblue;
 }
 

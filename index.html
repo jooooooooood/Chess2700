@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Chess Game</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>Chess Game</title>
     <link rel="stylesheet" href="styles.css">
-    <body>
-        <div id="gameboard"></div>
-        <p>It is <span id="player"></span> turn.</p>
-        <p id="info-display"></p>
-        
-        <script src="pieces.js"></script>
-        <script src="app.js"></script>
+</head>
+<body>
+    <div id="gameboard"></div>
+    <p>It is <span id="player"></span> turn.</p>
+    <p id="info-display"></p>
 
-    </body>
+    <!-- Button to revert move -->
+    <button onclick="revertMoveButton()">Revert Move</button>
 
+    <script src="pieces.js"></script>
+    <script src="app.js"></script>
+</body>
 </html>

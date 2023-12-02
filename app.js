@@ -53,10 +53,10 @@ function createBoard() {
         // Draws the checkered pattern on the chess board and appends each square to the gameBoard element
         const row = Math.floor(((63 - i) / 8) + 1)
         if (row % 2 === 0) {
-            square.classList.add(i % 2 === 0 ? "beige" : "brown")
+            square.classList.add(i % 2 === 0 ? "brown" : "blue")
         }
         else {
-            square.classList.add(i % 2 === 0 ? "brown" : "beige")
+            square.classList.add(i % 2 === 0 ? "blue" : "brown")
         }
         if (i <= 15) {
             square.firstChild.classList.add('black')
@@ -85,6 +85,14 @@ allSquares.forEach(square => {
 let startPositionID
 let draggedElement
 
+let kingInCheck
+let kingWasInCheck
+
+let newPos
+let oldPos
+let revertPiece
+let revertTaken
+
 // Function is called whenever an element begins to be dragged
 // It gets the startPostion of the element from its square-id: the 0-63 number of each square on the board
 // It also gets the draggedElement
@@ -103,7 +111,6 @@ function dragOver(e) {
 function dragDrop(e) {
     e.stopPropagation();
 
-
     const correctTurn = draggedElement.classList.contains(playerTurn)
     const taken = e.target.classList.contains('piece')
     const opponentTurn = playerTurn === 'white' ? 'black' : 'white'
@@ -119,7 +126,6 @@ function dragDrop(e) {
     
     const valid = checkIfValid(targetSquareID, startPositionID, draggedElement);
     
-    const kingInCheck = inCheck()
 
     console.log("valid move:  " + valid)
 
@@ -131,9 +137,6 @@ function dragDrop(e) {
     // If a piece is succesfully dropped the changePlayer function is called
 
     if (correctTurn && valid){
-        if (taken && takingAlly) {
-            return
-        }
         if (taken && !takingAlly) {
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
@@ -142,30 +145,66 @@ function dragDrop(e) {
         else if (!taken) {
             e.target.append(draggedElement);
         }
+        revertTaken = !taken
+        newPos = targetSquareID
+        oldPos = startPositionID
+        revertPiece = draggedElement
+        if (checkChecker()) {
+            revertMove();
+        }
+        else {
         changePlayer()
+        }
     }
+ }
 
+ function revertMoveButton() {
+    if (playerTurn == 'white') {
+        blackIDs();
+    }
+    else {
+        whiteIDs();
+    }
+    console.log(document.querySelector(`[square-id="${newPos}"]`))
+    if (revertTaken) {
+        document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
+    }
+    changePlayer();
+ }
+
+ function revertMove() {
+    if (playerTurn == 'white') {
+        whiteIDs();
+    }
+    else {
+        blackIDs();
+    }
+    console.log(document.querySelector(`[square-id="${newPos}"]`))
+    if (revertTaken) {
+        document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
+    }
  }
 
 
 function doesNotContainPiece(startID) {
-    // console.log(!document.querySelector(`[square-id="${startID}"]`).firstChild)
-    // console.log(document.querySelector(`[square-id="${startID}"]`).firstChild == " ")
-    // console.log(document.querySelector(`[square-id="${startID}"]`).firstChild == "")
-    // console.log(document.querySelector(`[square-id="${startID}"]`).firstChild === " ")
-    // console.log(document.querySelector(`[square-id="${startID}"]`).firstChild === "")
-    // console.log(document.querySelector(`[square-id="${startID}"]`).firstChild)
-
     return !document.querySelector(`[square-id="${startID}"]`).firstChild || document.querySelector(`[square-id="${startID}"]`).firstChild == " " 
 }
 
 // Checks if a move is valid but does not currently check if the move is legal
 // Contains all the logic for how pieces should move
 
+function checkChecker() {
+    
+    kingWasInCheck = kingInCheck
 
-// TODO: turn this into a general isLegalMove function
-// Thought: pass in color of the piece and the color of the opponent
-// If targetID has a piece of same color on it then return false
+    kingInCheck = inCheck()
+
+    if (kingWasInCheck && kingInCheck) {
+        return true
+    }
+}
+
+
 function checkIfValid(targetSquare, startPos, piece) {
     const targetID = Number(targetSquare)
     const startID = Number(startPos)
@@ -179,10 +218,12 @@ function checkIfValid(targetSquare, startPos, piece) {
         } else {
             pieceColor = 'black';
         }
-        if (document.querySelector(`[square-id="${targetID}"]`).firstChild && document.querySelector(`[square-id="${targetID}"]`).firstChild.classList.contains(pieceColor)) {
+        if (document.querySelector(`[square-id="${targetID}"]`).firstChild && 
+        document.querySelector(`[square-id="${targetID}"]`).firstChild.classList && document.querySelector(`[square-id="${targetID}"]`).firstChild.classList.contains(pieceColor)) {
             return false;
         }
     }
+
     
 
     switch(pieceID) {
@@ -211,6 +252,12 @@ function checkIfValid(targetSquare, startPos, piece) {
             }
             break;
         case 'bishop':
+            if (document.querySelector(`[square-id="${targetID}"]`).classList.contains('brown') && document.querySelector(`[square-id="${startID}"]`).classList.contains('blue')) {
+                return false
+            }
+            if (document.querySelector(`[square-id="${startID}"]`).classList.contains('brown') && document.querySelector(`[square-id="${targetID}"]`).classList.contains('blue')) {
+                return false
+            }
             if (
                 startID + width + 1 === targetID ||
                 (startID + width * 2 + 2 === targetID && !document.querySelector(`[square-id="${startID + width + 1}"]`).firstChild) ||
@@ -754,14 +801,14 @@ function checkIfValid(targetSquare, startPos, piece) {
 }
 
 // Makes the squareIDs from white's perspective
-function reverseIDs() {
+function whiteIDs() {
     const allSquares = document.querySelectorAll(".square")
     allSquares.forEach((square, i) => 
     square.setAttribute("square-id", (width * width - 1) - i))
 }
 
 // Makes the squareIDS from black's perspective
-function revertIDs() {
+function blackIDs() {
     const allSquares = document.querySelectorAll(".square")
     allSquares.forEach((square, i) => 
     square.setAttribute('square-id', i))
@@ -769,47 +816,80 @@ function revertIDs() {
 
 // Changes the playerTurn variable
  function changePlayer() {
+
     if (playerTurn === 'black') {
         playerTurn = 'white'
         playerDisplay.textContent = 'white'
-        reverseIDs()
+        whiteIDs()
     }
     else {
         playerTurn = 'black'
         playerDisplay.textContent = 'black'
-        revertIDs()
-
+        blackIDs()
     }
+
  }
+
 
 // In Progress Function used to see if the king is in check
 // Conceptual Idea: Create a list of all opponent pieces, for each piece generate a list of all the legal squares that piece can move o
 // add all these lists together to make a list of all the legal squares the opponent can move to
 // if the king's square is in that list of legal move squares, the king is in check
  function inCheck() {
-    const hitSquares = []
+    const blackHitSquares = []
+    const whiteHitSquares = []
 
-    if (playerTurn === 'white') {
         const blackPieces = document.querySelectorAll('.black')
         const whiteKingElement = document.querySelector('.piece.white#king');
-        const whiteKingPosition = whiteKingElement.parentNode.getAttribute("square-id")
-        revertIDs();
-
+        blackIDs();
+        const whiteKingPosition = Number(whiteKingElement.parentNode.getAttribute("square-id"))
+        const blackKingElement = document.querySelector('.piece.black#king');
+        const blackKingPosition = Number(blackKingElement.parentNode.getAttribute("square-id"))
         let pieceSquares = []
 
         blackPieces.forEach((piece) => {
-
             pieceSquares = checkAllLegalMovesForPiece(piece)
             pieceSquares.forEach((square) => {
-                if (!hitSquares.includes(square)){
-                hitSquares.push(square)
+                if (!blackHitSquares.includes(square)){
+                blackHitSquares.push(square)
                 }
             })
         })
-        console.log(hitSquares)
-        console.log(hitSquares.includes(whiteKingPosition))
+
+        
+        const whitePieces = document.querySelectorAll('.white')
+        whiteIDs();
+        whitePieces.forEach((piece) => {
+            if (piece.id === 'queen'){
+            pieceSquares = checkAllLegalMovesForPiece(piece)
+            pieceSquares.forEach((square) => {
+                if (!whiteHitSquares.includes(square)){
+                whiteHitSquares.push(square)
+                }
+            })
+        }
+        })
+    
+    console.log("It is " + blackHitSquares.includes(whiteKingPosition) + " that the white king is in check")
+    console.log("It is " + whiteHitSquares.includes(blackKingPosition) + " that the black king is in check")
+
+    console.log(whiteHitSquares)
+
+    if (playerTurn == 'white') {
+        whiteIDs();
     }
+    else {
+        blackIDs();
+    }
+
+    if (blackHitSquares.includes(whiteKingPosition) || whiteHitSquares.includes(blackKingPosition)) {
+        return true;
+    }
+    
+    return false;
+
  }
+
 
 // Helper function for the inCheck function
 // In Progress, currently iterates through all the positions 0-63 on the board and checks if a piece can legally move there
@@ -826,5 +906,5 @@ function revertIDs() {
     return legalMoveSquares
  }
  
- // Sets IDs  to white IDS when game begins
- reverseIDs()
+ // Sets IDs to white IDS when game begins
+ whiteIDs();
