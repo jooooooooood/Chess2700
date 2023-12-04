@@ -1,20 +1,24 @@
 #gameboard {
-    width: 320px;
-    height: 320px;
+    width: 450px;
+    height: 450px;
     display: flex;
     flex-wrap: wrap;
     background-color: black;
+    border: 6px outset #D0E9F1;
+    left: 23%;
+    top: 10%;
+    position: absolute;
 }
 
 .square {
-    height: 40px;
-    width: 40px;
+    height: 56px;
+    width: 56px;
     position: relative;
 }
 
 .square svg {
-    height: 30px;
-    width: 30px;
+    height: 45px;
+    width: 45px;
     margin: 5px;
     position: relative;
     z-index: -9;
@@ -49,4 +53,42 @@ path {
 
 .white {
     fill: white;
+}
+
+body {
+    background-color: #3E5C76;
+}
+
+button {
+    position: absolute;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);  
+    right: 510px;
+    top: 480px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: medium;
+}
+
+p {
+    position: absolute;
+    font-size: 25px;
+    font-family: "Times New Roman", Times, serif;
+    right: 468px;
+    top: 410px;
+}
+
+h4 {
+    font-family: 'Righteous', serif;
+    position: absolute;
+    font-size: 60px;
+    font-weight: 900;
+    line-height: 60px; 
+    margin: 10px 0 20px; 
+    text-transform: uppercase; 
+    text-shadow: 2px 2px 0 #1D2D44;
+    right: 230px;
+    top: 10%;
+    color: #D0E9F1;
 }
