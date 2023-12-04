@@ -9,6 +9,8 @@ const width = 8
 let playerTurn = 'white'
 playerDisplay.textContent = 'white'
 
+let audio = new Audio("move-self.mp3")
+
 
 // Array of starting positions of the pieces
 // Each piece is defined in the pieces.js file as an SVG
@@ -144,10 +146,12 @@ function dragDrop(e) {
             revertCapturedPiece = e.target
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
+            audio = new Audio("capture.mp3")
         }
     
         else if (!taken) {
             e.target.append(draggedElement);
+            audio = new Audio("move-self.mp3")
         }
 
         revertTaken = !taken
@@ -159,6 +163,7 @@ function dragDrop(e) {
             revertMove();
         }
         else {
+        audio.play();
         changePlayer()
         }
     }
@@ -981,8 +986,12 @@ function blackIDs() {
 
         if (doesNotContainPiece(randomMoveSquare)) {
         document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
+        audio = new Audio("move-self.mp3")
+
         }
         else {
+            audio = new Audio("capture.mp3")
+
             document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
             document.querySelector(`[square-id="${randomMoveSquare}"]`).firstChild.remove()
         }
@@ -1002,6 +1011,7 @@ function blackIDs() {
     }
     else {
     playerTurn = 'black'
+    audio.play()
     changePlayer()
     }
 
