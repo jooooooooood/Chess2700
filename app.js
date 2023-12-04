@@ -94,6 +94,7 @@ let newPos
 let oldPos
 let revertPiece
 let revertTaken
+let revertCapturedPiece
 
 // Function is called whenever an element begins to be dragged
 // It gets the startPostion of the element from its square-id: the 0-63 number of each square on the board
@@ -139,7 +140,8 @@ function dragDrop(e) {
     // If a piece is succesfully dropped the changePlayer function is called
 
     if (correctTurn && valid){
-        if (taken && !takingAlly) {
+        if (taken) {
+            revertCapturedPiece = e.target
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
         }
@@ -171,6 +173,7 @@ function dragDrop(e) {
     }
     if (revertTaken) {
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
+        document.querySelector(`[square-id="${newPos}"]`).append(revertCapturedPiece)
     }
     changePlayer();
  }
@@ -184,8 +187,12 @@ function dragDrop(e) {
     }
     if (revertTaken) {
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
+        document.querySelector(`[square-id="${newPos}"]`).append(revertCapturedPiece)
+    } 
+    else {
+        document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
     }
- }
+}
 
 //Checks to see if a square does not contain a piece
 function doesNotContainPiece(startID) {
@@ -202,6 +209,8 @@ function checkChecker() {
 
     blackKingWasInCheck = blackKingInCheck
     blackKingInCheck = blackInCheck()
+
+    console.log(blackKingInCheck + " bk in check")
 
     if (playerTurn === 'black' && !blackKingWasInCheck && blackKingInCheck) {
         return true
@@ -247,7 +256,7 @@ function checkIfValid(targetSquare, startPos, piece) {
     switch(pieceID) {
         case 'pawn' :
             const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
-            if (starterRow.includes(startID) && startID + width * 2 === targetID) {
+            if (starterRow.includes(startID) && startID + width * 2 === targetID && !document.querySelector(`[square-id="${startID + width}"]`).firstChild) {
                 return true
             }
             if (startID + width === targetID && !document.querySelector(`[square-id="${startID + width}"]`).firstChild) {
@@ -539,6 +548,7 @@ function checkIfValid(targetSquare, startPos, piece) {
             }
             break;
         case "queen":
+            
             if (
                 startID + width + 1 === targetID ||
                 (startID + width * 2 + 2 === targetID && !document.querySelector(`[square-id="${startID + width + 1}"]`).firstChild) ||
@@ -844,6 +854,13 @@ function blackIDs() {
         playerTurn = 'black'
         playerDisplay.textContent = 'black'
         blackIDs()
+    // Generate a random delay between 2 and 5 seconds (in milliseconds)
+    const randomDelay = Math.floor(Math.random() * (2500 - 1000 + 1)) + 1000;
+
+    // Call generateBlackMove after the random delay
+    setTimeout(() => {
+        generateBlackMove();
+    }, randomDelay);
     }
 
  }
@@ -878,7 +895,6 @@ function blackIDs() {
         blackIDs();
     }
 
-    console.log(whiteHitSquares)
 
     console.log("It is " + whiteHitSquares.includes(blackKingPosition) + " that the black king is in check")
 
@@ -935,6 +951,68 @@ function blackIDs() {
     }
     return legalMoveSquares
  }
+
+
+ // Array of tuples that contains black pieces and legal move squares
+ // Picks at random a piece then a move square
+ function generateBlackMove() {
+    blackIDs()
+    // Get all black pieces
+    const blackPieces = document.querySelectorAll('.black');
+
+    // Select a random black piece
+    const randomPieceIndex = Math.floor(Math.random() * blackPieces.length);
+    const randomBlackPiece = blackPieces[randomPieceIndex];
+
+    // Get legal move squares for the selected piece
+    const legalMoveSquares = checkAllLegalMovesForPiece(randomBlackPiece);
+
+    if (legalMoveSquares == 0) {
+        generateBlackMove();
+    }
+
+    // If there are legal moves, select a random legal move square
+    if (legalMoveSquares.length > 0) {
+        const randomMoveIndex = Math.floor(Math.random() * legalMoveSquares.length);
+        const randomMoveSquare = legalMoveSquares[randomMoveIndex];
+
+        oldPos = randomBlackPiece.parentNode.getAttribute('square-id')
+        revertPiece = randomBlackPiece
+
+        if (doesNotContainPiece(randomMoveSquare)) {
+        document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
+        }
+        else {
+            document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
+            document.querySelector(`[square-id="${randomMoveSquare}"]`).firstChild.remove()
+        }
+
+        console.log(randomBlackPiece.id + " to " + randomMoveSquare)
+
+
+        // console.log(randomMoveIndex + " randomMoveIndex")
+        // console.log(randomMoveSquare + " randomMoveSquare")
+        // console.log(legalMoveSquares + " legal move square")
+        // console.log(randomBlackPiece.id + " piece")
+    }
+
+    if (checkChecker()) {
+        revertMove()
+        generateBlackMove();
+    }
+    else {
+    playerTurn = 'black'
+    changePlayer()
+    }
+
+    // If no legal moves, return null
+    return null;
+}
+
+function checkMateChecker() {
+    
+}
+
  
  // Sets IDs to white IDS when game begins
  whiteIDs();
