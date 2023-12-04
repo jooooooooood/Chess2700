@@ -5,9 +5,34 @@
     flex-wrap: wrap;
     background-color: black;
     border: 6px outset #D0E9F1;
-    left: 23%;
-    top: 10%;
+    right: 400px;
+    top: 200px;
     position: absolute;
+}
+.ava1 {
+    border-color: black;
+    /* border-style: solid; */
+    border-width: 5px;
+    border-radius: 50%;
+    width: 20%;
+    padding: 15px;
+}
+.ava2 {
+    border-color: black;
+    /*border-style: solid;*/
+    border-width: 5px;
+    border-radius: 50%;
+    width: 20%;
+    padding: 15px;
+    position:absolute;
+    bottom: 0;
+    right: 0;
+}
+.flex-container {
+    min-height: 30px;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
 }
 
 .square {
@@ -65,8 +90,8 @@ button {
     border-radius: 5px;
     padding: 8px 12px;
     box-shadow: 2px 2px 0 rgba(0,0,0,0.1);  
-    right: 510px;
-    top: 480px;
+    left: 330px;
+    top: 700px;
     font-family: "Times New Roman", Times, serif;
     font-size: medium;
 }

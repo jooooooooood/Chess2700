@@ -3,55 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Chess Game</title>
-    <link rel="stylesheet" href="/Users/anayamitchell/Downloads/CM Assignments/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <style>
-        body {
-            background-color:antiquewhite;
-        }
-    </style>
-
-    <div class="flex-container">
-        <div class="ava1">
-          <img src="Stck Avatar.jpg" class="ava1" style="order: 1;" alt="Alps" />
-          <style>
-            .ava1 {
-                border-color: black;
-                /* border-style: solid; */
-                border-width: 5px;
-                border-radius: 50%;
-                width: 20%;
-                padding: 15px;
-            }
-          </style>
-        </div>
-        <div class="ava2" style="order: 2;">
-          <img src="Stck Avatar.jpg" class="ava2" alt="Alps" />
-          <style>
-            .ava2 {
-                border-radius: 60%;
-                border-color: black;
-                /* border-style: solid; */
-                border-width: 5px;
-                width: 20%;
-                padding: 15px;
-            }
-          </style>
-        </div>
-      </div>
-      
-      <style>
-      .flex-container {
-        min-height: 300px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      </style>
+    <h4>Chess Game</h4>
     <div id="gameboard"></div>
     <p>It is <span id="player"></span> turn.</p>
     <p id="info-display"></p>
+    <div class="flex-container">
+        <div class="ava1">
+          <img src="Stck Avatar.jpg" class="ava1"/>
+        </div>
+        <div class="ava2" style="order: 2;">
+          <img src="Stck Avatar.jpg" class="ava2"/>
+        </div>
+      </div>
 
     <!-- Button to revert move -->
     <button onclick="revertMoveButton()">Revert Move</button>
