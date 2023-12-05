@@ -124,7 +124,7 @@ h4 {
     display: flex;
     flex-wrap: wrap;
     background-color: transparent;
-    left: 20%;
+    left: 10%;
     top: 70%;
     position: absolute;
 }
@@ -135,7 +135,7 @@ h4 {
     display: flex;
     flex-wrap: wrap;
     background-color: transparent;
-    left: 50%;
-    top: 70%;
+    left: 10%;
+    top: 80%;
     position: absolute;
 }

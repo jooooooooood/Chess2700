@@ -1,26 +1,22 @@
 // Init the gameBoard and other UI elements
 const gameBoard = document.querySelector("#gameboard")
-console.log(gameBoard)
-const whiteCaptured = document.querySelector("#white-captured-pieces")
-console.log(whiteCaptured)
-const blackCaptured = document.querySelector("#black-captured-pieces")
-console.log(blackCaptured)
-
 const playerDisplay = document.querySelector("#player")
-console.log(playerDisplay)
-
 const infoDisplay = document.querySelector("#info-display")
 const width = 8
 
 // Global Variable for who's turn it is 
 // Set the text on screen accordingly
 let playerTurn = 'white'
-playerDisplay.textContent = 'white'
+playerDisplay.textContent = "White's turn"
 
 let audio = new Audio("move-self.mp3")
+
 const whiteCapturedPieces = [];
 const blackCapturedPieces = [];
 
+let blackGotMated = false
+let whiteGotMated = false
+let randomMoveSquare
 
 // Array of starting positions of the pieces
 // Each piece is defined in the pieces.js file as an SVG
@@ -107,6 +103,7 @@ let oldPos
 let revertPiece
 let revertTaken
 let revertCapturedPiece
+let reverted
 
 // Function is called whenever an element begins to be dragged
 // It gets the startPostion of the element from its square-id: the 0-63 number of each square on the board
@@ -125,6 +122,7 @@ function dragOver(e) {
 // This function currently checks to see if the piece 
 function dragDrop(e) {
     e.stopPropagation();
+    reverted = false;
 
     const correctTurn = draggedElement.classList.contains(playerTurn)
     const taken = e.target.classList.contains('piece')
@@ -154,18 +152,16 @@ function dragDrop(e) {
     if (correctTurn && valid){
         if (taken) {
             revertCapturedPiece = e.target
-            console.log(revertCapturedPiece)
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
             if (playerTurn === 'black') {
                 whiteCapturedPieces.push(revertCapturedPiece);
-                whiteCaptured.append(revertCapturedPiece);
+                document.getElementById('white-captured-pieces').append(revertCapturedPiece);
             } else {
                 blackCapturedPieces.push(revertCapturedPiece);
-                blackCaptured.append(revertCapturedPiece);
+                document.getElementById('black-captured-pieces').append(revertCapturedPiece);
             }
-            audio = new Audio("capture.mp3")
-            
+            audio = new Audio("capture.mp3") 
         }
     
         else if (!taken) {
@@ -183,26 +179,39 @@ function dragDrop(e) {
         }
         else {
         audio.play();
+        checkMateChecker()
         changePlayer()
         }
     }
  }
 
  function revertMoveButton() {
-    if (playerTurn == 'white') {
-        blackIDs();
-    }
-    else {
+    reverted = true;
+    if (playerTurn == 'black') {
         whiteIDs();
-    }
+
     if (revertTaken) {
+        if (revertPiece == null) {
+            return
+        }
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
+        if (revertCapturedPiece) {
         document.querySelector(`[square-id="${newPos}"]`).append(revertCapturedPiece)
+        }
+    }
+    if (whiteGotMated) {
+        playerDisplay.textContent =  "White got mated"
+    }
+    else if (blackGotMated) {
+        playerDisplay.textContent =  "Black got mated"
+
     }
     changePlayer();
+}
  }
 
  function revertMove() {
+    reverted = true;
     if (playerTurn == 'white') {
         whiteIDs();
     }
@@ -210,6 +219,7 @@ function dragDrop(e) {
         blackIDs();
     }
     if (revertTaken) {
+        console.log(revertCapturedPiece)
         document.querySelector(`[square-id="${oldPos}"]`).append(revertPiece)
         document.querySelector(`[square-id="${newPos}"]`).append(revertCapturedPiece)
     } 
@@ -274,8 +284,6 @@ function checkIfValid(targetSquare, startPos, piece) {
             return false;
         }
     }
-
-    
 
     switch(pieceID) {
         case 'pawn' :
@@ -871,19 +879,21 @@ function blackIDs() {
 
     if (playerTurn === 'black') {
         playerTurn = 'white'
-        playerDisplay.textContent = 'white'
+        playerDisplay.textContent =  "White's turn"
         whiteIDs()
     }
     else {
         playerTurn = 'black'
-        playerDisplay.textContent = 'black'
+        playerDisplay.textContent = "Black's turn"
         blackIDs()
     // Generate a random delay between 2 and 5 seconds (in milliseconds)
     const randomDelay = Math.floor(Math.random() * (2500 - 1000 + 1)) + 1000;
 
     // Call generateBlackMove after the random delay
     setTimeout(() => {
+        if (!reverted){
         generateBlackMove();
+        }
     }, randomDelay);
     }
 
@@ -918,9 +928,6 @@ function blackIDs() {
     else {
         blackIDs();
     }
-
-
-    console.log("It is " + whiteHitSquares.includes(blackKingPosition) + " that the black king is in check")
 
     return whiteHitSquares.includes(blackKingPosition)
 
@@ -977,9 +984,14 @@ function blackIDs() {
  }
 
 
- // Array of tuples that contains black pieces and legal move squares
  // Picks at random a piece then a move square
  function generateBlackMove() {
+    console.log(blackGotMated)
+    checkMateChecker()
+    if (blackGotMated) {
+        return
+    }
+    reverted = false;
     blackIDs()
     // Get all black pieces
     const blackPieces = document.querySelectorAll('.black');
@@ -998,24 +1010,28 @@ function blackIDs() {
     // If there are legal moves, select a random legal move square
     if (legalMoveSquares.length > 0) {
         const randomMoveIndex = Math.floor(Math.random() * legalMoveSquares.length);
-        const randomMoveSquare = legalMoveSquares[randomMoveIndex];
+        randomMoveSquare = legalMoveSquares[randomMoveIndex];
 
         oldPos = randomBlackPiece.parentNode.getAttribute('square-id')
         revertPiece = randomBlackPiece
 
         if (doesNotContainPiece(randomMoveSquare)) {
+        revertTaken = false;
         document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
         audio = new Audio("move-self.mp3")
 
         }
         else {
-            audio = new Audio("capture.mp3")
+            revertTaken = true;
+            revertPiece = randomBlackPiece
+            revertCapturedPiece = document.querySelector(`[square-id="${randomMoveSquare}"]`).firstChild
 
+            console.log(revertPiece)
+
+            audio = new Audio("capture.mp3")
             document.querySelector(`[square-id="${randomMoveSquare}"]`).append(randomBlackPiece)
             document.querySelector(`[square-id="${randomMoveSquare}"]`).firstChild.remove()
         }
-
-        console.log(randomBlackPiece.id + " to " + randomMoveSquare)
 
 
         // console.log(randomMoveIndex + " randomMoveIndex")
@@ -1029,6 +1045,7 @@ function blackIDs() {
         generateBlackMove();
     }
     else {
+    console.log(randomBlackPiece.id + " to " + randomMoveSquare)
     playerTurn = 'black'
     audio.play()
     changePlayer()
@@ -1039,6 +1056,40 @@ function blackIDs() {
 }
 
 function checkMateChecker() {
+    let pieceSquares = []
+    let mateArray = []
+    pieceSquares = []
+    const whitePieces = document.querySelectorAll('.white')
+    whitePieces.forEach((piece) => {
+        pieceSquares.push(checkAllLegalMovesForPiece(piece))
+        if (pieceSquares.length != 0) {
+                pieceSquares.forEach((piece) => {
+                    mateArray.push(piece)
+                }) 
+            }
+            if (mateArray.length == 0) {
+                whiteGotMated = true;
+            }
+        })
+
+
+        pieceSquares = []
+        let legalMoves = []
+        const blackPieces = document.querySelectorAll('.black')
+        blackPieces.forEach((piece) => {
+            legalMoves.push(checkAllLegalMovesForPiece(piece))
+            if (legalMoves.length > 0) {
+                legalMoves.forEach((spot) => {
+                    pieceSquares.push(spot)
+                })
+                legalMoves = []
+            }
+        })
+            if (pieceSquares.length == 0) {
+                blackGotMated = true;
+            }
+            console.log(pieceSquares)
+            console.log(blackGotMated)
     
 }
 
