@@ -5,8 +5,8 @@
     flex-wrap: wrap;
     background-color: black;
     border: 6px outset #D0E9F1;
-    right: 400px;
-    top: 200px;
+    left: 23%;
+    top: 10%;
     position: absolute;
 }
 .ava1 {
@@ -90,8 +90,8 @@ button {
     border-radius: 5px;
     padding: 8px 12px;
     box-shadow: 2px 2px 0 rgba(0,0,0,0.1);  
-    left: 330px;
-    top: 700px;
+    right: 510px;
+    top: 480px;
     font-family: "Times New Roman", Times, serif;
     font-size: medium;
 }
