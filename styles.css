@@ -118,21 +118,24 @@ h4 {
     color: #D0E9F1;
 }
 
-.white-captured {
-    background-color: transparent /* Adjust the background color as needed */
-}
-
-.black-captured {
-    background-color: transparent; /* Adjust the background color as needed */
-}
-
-.captured-pieces-container {
+#black-captured-pieces {
+    width: 450px;
+    height: 150px;
     display: flex;
     flex-wrap: wrap;
+    background-color: transparent;
+    left: 20%;
+    top: 70%;
+    position: absolute;
 }
 
-.captured-pieces-container img {
-    width: 20px; /* Adjust the size as needed */
-    margin: 2px; /* Adjust the margin as needed */
-    border: 1px solid #ccc
+#white-captured-pieces {
+    width: 450px;
+    height: 150px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: transparent;
+    left: 50%;
+    top: 70%;
+    position: absolute;
 }

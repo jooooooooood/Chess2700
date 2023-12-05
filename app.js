@@ -1,6 +1,14 @@
 // Init the gameBoard and other UI elements
 const gameBoard = document.querySelector("#gameboard")
+console.log(gameBoard)
+const whiteCaptured = document.querySelector("#white-captured-pieces")
+console.log(whiteCaptured)
+const blackCaptured = document.querySelector("#black-captured-pieces")
+console.log(blackCaptured)
+
 const playerDisplay = document.querySelector("#player")
+console.log(playerDisplay)
+
 const infoDisplay = document.querySelector("#info-display")
 const width = 8
 
@@ -10,9 +18,9 @@ let playerTurn = 'white'
 playerDisplay.textContent = 'white'
 
 let audio = new Audio("move-self.mp3")
-
 const whiteCapturedPieces = [];
 const blackCapturedPieces = [];
+
 
 // Array of starting positions of the pieces
 // Each piece is defined in the pieces.js file as an SVG
@@ -146,14 +154,15 @@ function dragDrop(e) {
     if (correctTurn && valid){
         if (taken) {
             revertCapturedPiece = e.target
+            console.log(revertCapturedPiece)
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
             if (playerTurn === 'black') {
                 whiteCapturedPieces.push(revertCapturedPiece);
-                document.getElementById('white-captured-pieces').append(revertCapturedPiece);
+                whiteCaptured.append(revertCapturedPiece);
             } else {
                 blackCapturedPieces.push(revertCapturedPiece);
-                document.getElementById('black-captured-pieces').append(revertCapturedPiece);
+                blackCaptured.append(revertCapturedPiece);
             }
             audio = new Audio("capture.mp3")
             
