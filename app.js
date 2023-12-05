@@ -7,7 +7,7 @@ const width = 8
 // Global Variable for who's turn it is 
 // Set the text on screen accordingly
 let playerTurn = 'white'
-playerDisplay.textContent = "White's turn"
+playerDisplay.textContent = "White's"
 
 let audio = new Audio("move-self.mp3")
 
@@ -879,12 +879,12 @@ function blackIDs() {
 
     if (playerTurn === 'black') {
         playerTurn = 'white'
-        playerDisplay.textContent =  "White's turn"
+        playerDisplay.textContent =  "White's"
         whiteIDs()
     }
     else {
         playerTurn = 'black'
-        playerDisplay.textContent = "Black's turn"
+        playerDisplay.textContent = "Black's"
         blackIDs()
     // Generate a random delay between 2 and 5 seconds (in milliseconds)
     const randomDelay = Math.floor(Math.random() * (2500 - 1000 + 1)) + 1000;
