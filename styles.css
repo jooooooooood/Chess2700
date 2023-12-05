@@ -117,3 +117,22 @@ h4 {
     top: 10%;
     color: #D0E9F1;
 }
+
+.white-captured {
+    background-color: transparent /* Adjust the background color as needed */
+}
+
+.black-captured {
+    background-color: transparent; /* Adjust the background color as needed */
+}
+
+.captured-pieces-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.captured-pieces-container img {
+    width: 20px; /* Adjust the size as needed */
+    margin: 2px; /* Adjust the margin as needed */
+    border: 1px solid #ccc
+}

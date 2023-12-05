@@ -7,8 +7,9 @@
 </head>
 <body>
     <h4>Chess Game</h4>
-    <div id="gameboard"></div>
     <p>It is <span id="player"></span> turn.</p>
+    <div id="gameboard"></div>
+   
     <p id="info-display"></p>
     <div class="flex-container">
         <div class="ava1">
@@ -18,10 +19,12 @@
           <img src="Stck Avatar.jpg" class="ava2"/>
         </div>
       </div>
-
+    </div>
+    <div id="white-captured-pieces" class="captured-pieces-container white-captured"></div>
+    <div id="black-captured-pieces" class="captured-pieces-container black-captured"></div>
     <!-- Button to revert move -->
     <button onclick="revertMoveButton()">Revert Move</button>
-
+    <!--<div id="captured-pieces" class="captured-pieces-container"></div> -->
     <script src="pieces.js"></script>
     <script src="app.js"></script>
 </body>

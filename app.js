@@ -11,6 +11,8 @@ playerDisplay.textContent = 'white'
 
 let audio = new Audio("move-self.mp3")
 
+const whiteCapturedPieces = [];
+const blackCapturedPieces = [];
 
 // Array of starting positions of the pieces
 // Each piece is defined in the pieces.js file as an SVG
@@ -146,7 +148,15 @@ function dragDrop(e) {
             revertCapturedPiece = e.target
             e.target.parentNode.append(draggedElement);
             e.target.remove()   
+            if (playerTurn === 'black') {
+                whiteCapturedPieces.push(revertCapturedPiece);
+                document.getElementById('white-captured-pieces').append(revertCapturedPiece);
+            } else {
+                blackCapturedPieces.push(revertCapturedPiece);
+                document.getElementById('black-captured-pieces').append(revertCapturedPiece);
+            }
             audio = new Audio("capture.mp3")
+            
         }
     
         else if (!taken) {
